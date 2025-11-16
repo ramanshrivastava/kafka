@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'minikafka'
+version = '0.1.0-SNAPSHOT'
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'ch.qos.logback:logback-classic:1.4.11'
+
+    // Testing
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = false
+    }
+}
+
+application {
+    mainClass = 'minikafka.server.KafkaBroker'
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'minikafka.server.KafkaBroker',
+            'Implementation-Title': 'Mini-Kafka',
+            'Implementation-Version': version
+        )
+    }
+}
+
+// Custom task to run examples
+task runProducer(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'minikafka.examples.SimpleProducer'
+}
+
+task runConsumer(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'minikafka.examples.SimpleConsumer'
+}
+
+// Formatting
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:unchecked' << '-Xlint:deprecation'
+}
